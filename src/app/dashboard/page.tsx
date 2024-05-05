@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import Container from '@/components/common/container';
 import Form from '@/components/dashboard/form';
 import Habits from '@/components/dashboard/habits';
 import {
@@ -24,19 +26,40 @@ const Dashboard = async () => {
 
   const habitsData = await getHabits(user);
 
-  if (!habitsData || habitsData.length === 0) {
-    return <div>You have no habits yet.</div>;
+  // check if the user is already a customer
+  if (user) {
+    const res = await checkIfUserIsCustomer(user.id);
+    if (res === null) {
+      return (
+        <Container className="flex flex-col items-start gap-1 text-sm">
+          <p>
+            It seems like you have not yet subscribed to our service. Please go
+            to your account page.
+          </p>
+          <Link
+            href="/dashboard/account"
+            className="rounded-md bg-gray-800 px-2 py-1 text-white"
+          >
+            Account
+          </Link>
+        </Container>
+      );
+    }
   }
-
-  const checkIfCustomerIsClient = await checkIfUserIsCustomer(user);
 
   return (
     <div className="mx-auto flex max-w-[500px] flex-col gap-4">
       <Form action={addHabit} />
-      <Habits
-        habits={habitsData}
-        handleHabitCheckClick={handleHabitOccurenceCheck}
-      />
+      {!habitsData && <Container className="text-sm">Loading...</Container>}
+      {habitsData && habitsData.length === 0 && (
+        <Container className="text-sm">You have no habits yet.</Container>
+      )}
+      {habitsData && habitsData.length > 0 && (
+        <Habits
+          habits={habitsData}
+          handleHabitCheckClick={handleHabitOccurenceCheck}
+        />
+      )}
     </div>
   );
 };
