@@ -1,6 +1,8 @@
 'use server';
 import { User } from '@supabase/supabase-js';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
+import Stripe from 'stripe';
 
 import { createClient } from '@/utils/supabase/server';
 
@@ -184,9 +186,42 @@ const checkIfUserIsCustomer = async (uuid: string) => {
   }
 };
 
+const manageSubscriptionStatusChange = async (
+  customerId: string,
+  event: Stripe.Event,
+) => {
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+  );
+
+  const { data: customerData, error: noCustomerError } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('stripe_customer_id', customerId)
+    .single();
+
+  if (noCustomerError)
+    throw new Error(`Customer lookup failed: ${noCustomerError.message}`);
+
+  const { id: uuid } = customerData!;
+
+  if (event.type === 'customer.subscription.deleted') {
+    const { error: deleteError } = await supabase
+      .from('customers')
+      .delete()
+      .eq('id', uuid);
+    if (deleteError)
+      throw new Error(`Subscription deletion failed: ${deleteError.message}`);
+    console.log(`Deleted subscription for user [${uuid}]`);
+    return;
+  }
+};
+
 export {
   getHabits,
   handleHabitOccurenceCheck,
   createOrRetrieveCustomer,
   checkIfUserIsCustomer,
+  manageSubscriptionStatusChange,
 };

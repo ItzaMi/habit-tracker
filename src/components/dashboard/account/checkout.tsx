@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 
 import Container from '@/components/common/container';
-import { getStripe } from '@/lib/stripe/client';
-import { checkoutWithStripe, createStripePortal } from '@/lib/stripe/server';
-import { checkIfUserIsCustomer } from '@/lib/supabase/api';
+import { getStripe } from '@/utils/stripe/client';
+import { checkoutWithStripe, createStripePortal } from '@/utils/stripe/server';
+import { checkIfUserIsCustomer } from '@/utils/supabase/api';
 import { createClient } from '@/utils/supabase/client';
 
 const Checkout = () => {

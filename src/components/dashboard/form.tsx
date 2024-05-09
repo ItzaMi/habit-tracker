@@ -1,5 +1,6 @@
-"use client";
-import { FC, useRef } from "react";
+'use client';
+import { Plus } from 'lucide-react';
+import { FC, useRef } from 'react';
 
 interface Props {
   action: (formData: FormData) => void;
@@ -10,25 +11,27 @@ const Form: FC<Props> = ({ action }) => {
 
   return (
     <form
-      className="flex flex-row gap-1 items-center text-sm justify-between border-2 border-slate-200 px-4 py-2 rounded-lg"
+      className="flex flex-row items-center justify-between gap-1"
       ref={ref}
       action={(formData) => {
         action(formData);
         ref.current?.reset();
       }}
     >
-      <input
-        id="habit"
-        type="text"
-        name="habit"
-        placeholder="Habit name"
-        className="outline-none w-full"
-      />
+      <div className="flex h-10 w-full items-center rounded-lg border-2  border-slate-200 px-4 text-sm">
+        <input
+          id="habit"
+          type="text"
+          name="habit"
+          placeholder="Habit name"
+          className="w-full outline-none"
+        />
+      </div>
       <button
         type="submit"
-        className="font-bold py-1 rounded-full px-4 cursor-pointer bg-slate-200 flex-shrink-0"
+        className="bg-slate-white flex h-10 w-10 flex-shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-slate-200 hover:border-slate-100"
       >
-        Add habit
+        <Plus size={12} />
       </button>
     </form>
   );

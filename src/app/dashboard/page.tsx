@@ -8,7 +8,7 @@ import {
   checkIfUserIsCustomer,
   getHabits,
   handleHabitOccurenceCheck,
-} from '@/lib/supabase/api';
+} from '@/utils/supabase/api';
 import { createClient } from '@/utils/supabase/server';
 
 import { addHabit } from './actions';
@@ -27,15 +27,33 @@ const Dashboard = async () => {
   const habitsData = await getHabits(user);
 
   // check if the user is already a customer
+  let isCustomer = false;
   if (user) {
     const res = await checkIfUserIsCustomer(user.id);
-    if (res === null) {
-      return (
+    if (res !== null) {
+      isCustomer = true;
+    }
+  }
+
+  const canAddHabit = isCustomer || (habitsData && habitsData.length < 2);
+
+  const habitsToDisplay =
+    canAddHabit && habitsData
+      ? habitsData
+      : !canAddHabit
+        ? habitsData.slice(0, 2)
+        : [];
+
+  return (
+    <div className="mx-auto flex max-w-[500px] flex-col gap-4">
+      {canAddHabit && <Form action={addHabit} />}
+      {!canAddHabit && (
         <Container className="flex flex-col items-start gap-1 text-sm">
           <p>
-            It seems like you have not yet subscribed to our service. Please go
-            to your account page.
+            You have reached the maximum number of habits available on the free
+            tier.
           </p>
+          <p>To add more habits, please upgrade your account.</p>
           <Link
             href="/dashboard/account"
             className="rounded-md bg-gray-800 px-2 py-1 text-white"
@@ -43,20 +61,16 @@ const Dashboard = async () => {
             Account
           </Link>
         </Container>
-      );
-    }
-  }
-
-  return (
-    <div className="mx-auto flex max-w-[500px] flex-col gap-4">
-      <Form action={addHabit} />
-      {!habitsData && <Container className="text-sm">Loading...</Container>}
-      {habitsData && habitsData.length === 0 && (
+      )}
+      {!habitsToDisplay && (
+        <Container className="text-sm">Loading...</Container>
+      )}
+      {habitsToDisplay && habitsToDisplay.length === 0 && (
         <Container className="text-sm">You have no habits yet.</Container>
       )}
-      {habitsData && habitsData.length > 0 && (
+      {habitsToDisplay && habitsToDisplay.length > 0 && (
         <Habits
-          habits={habitsData}
+          habits={habitsToDisplay}
           handleHabitCheckClick={handleHabitOccurenceCheck}
         />
       )}
