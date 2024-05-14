@@ -2,7 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
 import './globals.css';
+import Footer from '@/components/common/footer';
 import Navbar from '@/components/common/navbar';
+import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -25,9 +27,10 @@ const RootLayout = async ({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={cn('px-4', inter.className)}>
         <Navbar user={user} />
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -1,8 +1,14 @@
+import Link from 'next/link';
+
+import Hero from '@/components/homepage/hero';
+import Illustration from '@/components/homepage/illustration';
+import Info from '@/components/homepage/info';
+
 const Page = () => {
   return (
     <div>
-      <h1>Page</h1>
-      <p>This is a page</p>
+      <Hero />
+      <Info />
     </div>
   );
 };
