@@ -1,6 +1,6 @@
 'use server';
 import { revalidatePath } from 'next/cache';
-import { NextResponse } from 'next/server';
+import { redirect } from 'next/navigation';
 
 import { createClient } from '@/utils/supabase/server';
 
@@ -12,13 +12,14 @@ const handleLogout = async () => {
   } = await supabase.auth.getUser();
 
   if (user) {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   }
 
-  revalidatePath('/', 'layout');
-  return NextResponse.redirect(new URL('/login'), {
-    status: 302,
-  });
+  return redirect('/');
 };
 
 export { handleLogout };
