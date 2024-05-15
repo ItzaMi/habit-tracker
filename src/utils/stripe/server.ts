@@ -6,7 +6,7 @@ import { createOrRetrieveCustomer } from '../supabase/api';
 
 const getUrl = () => {
   if (process.env.NODE_ENV === 'production') {
-    return 'https://your-production-url.com';
+    return 'https://itzahabit.itzami.com/';
   }
 
   return 'http://localhost:3000';
