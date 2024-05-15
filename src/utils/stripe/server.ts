@@ -44,7 +44,7 @@ const checkoutWithStripe = async () => {
       ui_mode: 'embedded',
       line_items: [
         {
-          price: 'price_1PCmMDL9OIiSaVJXiK6l0H9W',
+          price: process.env.STRIPE_PRODUCT_ID,
           quantity: 1,
         },
       ],
