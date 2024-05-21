@@ -60,6 +60,39 @@ const handleHabitOccurenceCheck = async (habitName: string) => {
   }
 };
 
+const handleHabitDelete = async (habitName: string) => {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('user_id', user?.id);
+
+  if (!profilesData || profilesData.length === 0) {
+    return;
+  }
+
+  const newHabits = profilesData[0].habits.filter(
+    (habit: { name: string }) => habit.name !== habitName,
+  );
+
+  const { error, status } = await supabase
+    .from('profiles')
+    .update({ habits: newHabits })
+    .eq('user_id', user?.id);
+
+  if (error && status !== 406) {
+    console.log(error);
+    throw error;
+  }
+
+  revalidatePath('/dashboard');
+};
+
 const getHabits = async (user: User) => {
   const supabase = createClient();
 
@@ -221,6 +254,7 @@ const manageSubscriptionStatusChange = async (
 export {
   getHabits,
   handleHabitOccurenceCheck,
+  handleHabitDelete,
   createOrRetrieveCustomer,
   checkIfUserIsCustomer,
   manageSubscriptionStatusChange,
