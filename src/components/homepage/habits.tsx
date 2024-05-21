@@ -39,6 +39,7 @@ const Habits = () => {
         habit={{
           occurences: habit1Occurences,
           name: 'Walking 10K steps 🚶',
+          created_at: '2024-04-11T21:54:31.269Z',
         }}
         handleHabitCheckClick={() =>
           setHabit1Occurences([
@@ -46,11 +47,13 @@ const Habits = () => {
             new Date().toISOString().split('T')[0],
           ])
         }
+        handleHabitDeleteClick={() => {}}
       />
       <Habit
         habit={{
           occurences: habit2Occurences,
           name: 'Read 15 minutes 📚',
+          created_at: '2024-04-11T21:54:31.269Z',
         }}
         handleHabitCheckClick={() =>
           setHabit2Occurences([
@@ -58,11 +61,13 @@ const Habits = () => {
             new Date().toISOString().split('T')[0],
           ])
         }
+        handleHabitDeleteClick={() => {}}
       />
       <Habit
         habit={{
           occurences: habit3Occurences,
           name: 'Clean the house 🧹',
+          created_at: '2024-04-11T21:54:31.269Z',
         }}
         handleHabitCheckClick={() =>
           setHabit3Occurences([
@@ -70,6 +75,7 @@ const Habits = () => {
             new Date().toISOString().split('T')[0],
           ])
         }
+        handleHabitDeleteClick={() => {}}
       />
     </div>
   );

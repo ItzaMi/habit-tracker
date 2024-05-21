@@ -8,6 +8,7 @@ import {
   checkIfUserIsCustomer,
   getHabits,
   handleHabitOccurenceCheck,
+  handleHabitDelete,
 } from '@/utils/supabase/api';
 import { createClient } from '@/utils/supabase/server';
 
@@ -46,6 +47,22 @@ const Dashboard = async () => {
 
   return (
     <div className="mx-auto flex max-w-[500px] flex-col gap-4">
+      {!habitsToDisplay && (
+        <Container className="text-sm">Loading...</Container>
+      )}
+      {habitsToDisplay && habitsToDisplay.length === 0 && (
+        <Container className="text-sm">You have no habits yet.</Container>
+      )}
+      {habitsToDisplay && habitsToDisplay.length > 0 && (
+        <Habits
+          habits={habitsToDisplay}
+          handleHabitCheckClick={handleHabitOccurenceCheck}
+          handleHabitDeleteClick={handleHabitDelete}
+        />
+      )}
+
+      <div className="h-px w-full bg-slate-200" />
+
       {canAddHabit && <Form action={addHabit} />}
       {!canAddHabit && (
         <Container className="flex flex-col items-start gap-1 text-sm">
@@ -61,18 +78,6 @@ const Dashboard = async () => {
             Account
           </Link>
         </Container>
-      )}
-      {!habitsToDisplay && (
-        <Container className="text-sm">Loading...</Container>
-      )}
-      {habitsToDisplay && habitsToDisplay.length === 0 && (
-        <Container className="text-sm">You have no habits yet.</Container>
-      )}
-      {habitsToDisplay && habitsToDisplay.length > 0 && (
-        <Habits
-          habits={habitsToDisplay}
-          handleHabitCheckClick={handleHabitOccurenceCheck}
-        />
       )}
     </div>
   );

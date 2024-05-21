@@ -1,5 +1,5 @@
 'use client';
-import { Check, LineChart, Plus } from 'lucide-react';
+import { Check, Info, Plus, Trash2 } from 'lucide-react';
 import { FC, useState } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -10,11 +10,17 @@ interface Props {
   habit: {
     occurences: string[];
     name: string;
+    created_at: string;
   };
   handleHabitCheckClick: (habitName: string) => void;
+  handleHabitDeleteClick: (habitName: string) => void;
 }
 
-const Habit: FC<Props> = ({ habit, handleHabitCheckClick }) => {
+const Habit: FC<Props> = ({
+  habit,
+  handleHabitCheckClick,
+  handleHabitDeleteClick,
+}) => {
   const [showHabitStats, setShowHabitStats] = useState(false);
 
   const habitIsAlreadyChecked = habit.occurences.includes(
@@ -27,6 +33,14 @@ const Habit: FC<Props> = ({ habit, handleHabitCheckClick }) => {
 
     return formattedDate;
   };
+
+  function isWithin48Hours(created_at: string): boolean {
+    const timeDifference =
+      new Date().getTime() - new Date(created_at).getTime();
+    const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+    return hoursDifference <= 48;
+  }
 
   return (
     <div className="flex flex-col gap-1">
@@ -41,7 +55,7 @@ const Habit: FC<Props> = ({ habit, handleHabitCheckClick }) => {
             showHabitStats ? 'bg-slate-100' : 'bg-white',
           )}
         >
-          <LineChart size={12} />
+          <Info size={12} />
         </button>
         <button
           className={cn(
@@ -56,7 +70,7 @@ const Habit: FC<Props> = ({ habit, handleHabitCheckClick }) => {
       </div>
       {showHabitStats && (
         <div className="rounded-lg border-2 border-slate-200 px-4 py-2 text-xs">
-          {habit.occurences.length > 0 ? (
+          {habit.occurences.length > 0 && (
             <div className="flex w-full flex-col gap-2">
               <div className="flex w-full flex-row items-center justify-between">
                 <p>Starting date: {formattedDate(habit.occurences[0])}</p>
@@ -64,11 +78,22 @@ const Habit: FC<Props> = ({ habit, handleHabitCheckClick }) => {
               </div>
               <DotGraph occurences={habit.occurences} />
             </div>
-          ) : (
+          )}
+          {habit.occurences.length === 0 && (
             <p>
               You haven&apos;t started your habit yet!{' '}
               <span className="font-bold">Make today count!</span>
             </p>
+          )}
+          {isWithin48Hours(habit.created_at) && (
+            <div className="flex justify-end">
+              <button
+                className="cursor-pointer rounded-sm bg-red-400/10 p-1 text-red-600 transition-all hover:bg-red-400/30"
+                onClick={() => handleHabitDeleteClick(habit.name)}
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
           )}
         </div>
       )}
