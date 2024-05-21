@@ -32,6 +32,7 @@ const addHabit = async (formData: FormData) => {
         {
           name: dataToAdd.habit,
           occurences: [],
+          created_at: new Date().toISOString(),
         },
       ],
     });
@@ -45,6 +46,7 @@ const addHabit = async (formData: FormData) => {
           {
             name: dataToAdd.habit,
             occurences: [],
+            created_at: new Date().toISOString(),
           },
         ],
       })
