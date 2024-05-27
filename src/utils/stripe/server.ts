@@ -1,4 +1,6 @@
 'use server';
+import { redirect } from 'next/navigation';
+
 import { createClient } from '@/utils/supabase/server';
 
 import { stripe } from './config';
@@ -72,7 +74,6 @@ const createStripePortal = async () => {
 
     if (!user) {
       if (error) {
-        console.error(error);
       }
       throw new Error('Could not get user session.');
     }
@@ -100,7 +101,8 @@ const createStripePortal = async () => {
       if (!url) {
         throw new Error('Could not create billing portal');
       }
-      return url;
+
+      redirect(url);
     } catch (err) {
       console.error(err);
       throw new Error('Could not create billing portal');

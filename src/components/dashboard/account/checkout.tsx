@@ -15,7 +15,6 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     if (userHasSubscription) {
       const result = await createStripePortal();
-      console.log(result);
     } else {
       const result = await checkoutWithStripe();
 
