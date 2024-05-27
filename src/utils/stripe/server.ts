@@ -102,7 +102,7 @@ const createStripePortal = async () => {
         throw new Error('Could not create billing portal');
       }
 
-      redirect(url);
+      return url;
     } catch (err) {
       console.error(err);
       throw new Error('Could not create billing portal');

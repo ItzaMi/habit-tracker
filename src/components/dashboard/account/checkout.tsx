@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 
 import Container from '@/components/common/container';
@@ -15,6 +14,8 @@ const Checkout = () => {
   const handleStripeCheckout = async () => {
     if (userHasSubscription) {
       const result = await createStripePortal();
+
+      window.open(result, '_blank');
     } else {
       const result = await checkoutWithStripe();
 
