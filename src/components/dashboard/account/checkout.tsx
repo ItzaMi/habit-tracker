@@ -13,9 +13,10 @@ const Checkout = () => {
 
   const handleStripeCheckout = async () => {
     if (userHasSubscription) {
-      const result = await createStripePortal();
-
-      window.open(result, '_blank');
+      window.open(
+        'https://billing.stripe.com/p/login/dR6dTPd8ZdOIeVa4gg',
+        '_blank',
+      );
     } else {
       const result = await checkoutWithStripe();
 
