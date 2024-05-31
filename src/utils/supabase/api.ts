@@ -240,14 +240,16 @@ const manageSubscriptionStatusChange = async (
   const { id: uuid } = customerData!;
 
   if (event.type === 'customer.subscription.deleted') {
-    const { error: deleteError } = await supabase
+    const { data, error: deleteError } = await supabase
       .from('customers')
       .delete()
       .eq('id', uuid);
-    if (deleteError)
+
+    if (deleteError) {
       throw new Error(`Subscription deletion failed: ${deleteError.message}`);
+    }
     console.log(`Deleted subscription for user [${uuid}]`);
-    return;
+    return data;
   }
 };
 
