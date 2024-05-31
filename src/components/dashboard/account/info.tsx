@@ -13,8 +13,8 @@ const Info: FC<Props> = ({ user }) => {
       <p>Hey, {user.email}!</p>
       <p>
         Having problems with something? Email us as{' '}
-        <a href="mailto:something@something.com" className="underline">
-          something@something.com
+        <a href="mailto:rros00@gmail.com" className="underline">
+          rros00@gmail.com
         </a>
       </p>
     </Container>
