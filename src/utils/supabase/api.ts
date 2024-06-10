@@ -281,9 +281,12 @@ const manageSubscriptionStatusChange = async (
     throw new Error(
       `Subscription insert/update failed: ${upsertError.message}`,
     );
+
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`,
   );
+
+  return subscriptionData;
 };
 
 export {
