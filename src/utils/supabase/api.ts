@@ -149,6 +149,8 @@ const createOrRetrieveCustomer = async ({
     throw new Error(`Supabase customer lookup failed: ${queryError.message}`);
   }
 
+  console.log('existingSupabaseCustomer', existingSupabaseCustomer);
+
   // Retrieve the Stripe customer ID using the Supabase customer ID, with email fallback
   let stripeCustomerId: string | undefined;
   if (existingSupabaseCustomer?.stripe_customer_id) {
@@ -167,6 +169,8 @@ const createOrRetrieveCustomer = async ({
   const stripeIdToInsert = stripeCustomerId
     ? stripeCustomerId
     : await createCustomerInStripe(uuid, email);
+
+  console.log('stripeIdToInsert', stripeIdToInsert);
   if (!stripeIdToInsert) throw new Error('Stripe customer creation failed.');
 
   if (existingSupabaseCustomer && stripeCustomerId) {
@@ -213,24 +217,37 @@ const checkIfUserIsCustomer = async (uuid: string) => {
     .maybeSingle();
 
   if (customerData) {
-    return customerData;
+    const { data: subscriptionData, error: queryError } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', uuid)
+      .maybeSingle();
+
+    console.log('s', subscriptionData);
+
+    if (subscriptionData.status === 'active') {
+      return customerData;
+    } else {
+      return null;
+    }
   } else {
     return null;
   }
 };
-
 const manageSubscriptionStatusChange = async (
+  subscriptionId: string,
   customerId: string,
-  event: Stripe.Event,
+  createAction = false,
 ) => {
   const supabase = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   );
 
+  // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabase
     .from('customers')
-    .select('*')
+    .select('id')
     .eq('stripe_customer_id', customerId)
     .single();
 
@@ -239,18 +256,29 @@ const manageSubscriptionStatusChange = async (
 
   const { id: uuid } = customerData!;
 
-  if (event.type === 'customer.subscription.deleted') {
-    const { data, error: deleteError } = await supabase
-      .from('customers')
-      .delete()
-      .eq('id', uuid);
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ['default_payment_method'],
+  });
 
-    if (deleteError) {
-      throw new Error(`Subscription deletion failed: ${deleteError.message}`);
-    }
-    console.log(`Deleted subscription for user [${uuid}]`);
-    return data;
-  }
+  const subscriptionData = {
+    subscription_id: subscription.id,
+    user_id: uuid,
+    status: subscription.status,
+  };
+
+  const { error: upsertError } = await supabase
+    .from('subscriptions')
+    .upsert([subscriptionData], {
+      onConflict: 'user_id',
+      ignoreDuplicates: false,
+    });
+  if (upsertError)
+    throw new Error(
+      `Subscription insert/update failed: ${upsertError.message}`,
+    );
+  console.log(
+    `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`,
+  );
 };
 
 export {

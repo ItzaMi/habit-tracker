@@ -34,17 +34,23 @@ export async function POST(req: Request) {
         case 'customer.subscription.deleted':
           const subscription = event.data.object as Stripe.Subscription;
 
+          console.log('sub', subscription);
+
           await manageSubscriptionStatusChange(
+            subscription.id,
             subscription.customer as string,
-            event,
+            event.type === 'customer.subscription.created',
           );
           break;
         case 'checkout.session.completed':
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
+
           if (checkoutSession.mode === 'subscription') {
+            const subscriptionId = checkoutSession.subscription as string;
             await manageSubscriptionStatusChange(
+              subscriptionId,
               checkoutSession.customer as string,
-              event,
+              true,
             );
           }
           break;
