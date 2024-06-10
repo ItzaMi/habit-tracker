@@ -256,9 +256,13 @@ const manageSubscriptionStatusChange = async (
 
   const { id: uuid } = customerData!;
 
+  console.log('customer data', uuid);
+
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method'],
   });
+
+  console.log('subscription data', subscription);
 
   const subscriptionData = {
     subscription_id: subscription.id,
