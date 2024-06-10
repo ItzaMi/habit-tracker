@@ -225,6 +225,10 @@ const checkIfUserIsCustomer = async (uuid: string) => {
 
     console.log('s', subscriptionData);
 
+    if (!subscriptionData) {
+      return null;
+    }
+
     if (subscriptionData.status === 'active') {
       return customerData;
     } else {
