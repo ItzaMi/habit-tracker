@@ -265,6 +265,10 @@ const manageSubscriptionStatusChange = async (
 
   console.log('subscription data', subscription);
 
+  if (!subscription) {
+    throw new Error('Subscription not found.');
+  }
+
   const subscriptionData = {
     subscription_id: subscription.id,
     user_id: uuid,
@@ -277,10 +281,12 @@ const manageSubscriptionStatusChange = async (
       onConflict: 'user_id',
       ignoreDuplicates: false,
     });
-  if (upsertError)
+
+  if (upsertError) {
     throw new Error(
       `Subscription insert/update failed: ${upsertError.message}`,
     );
+  }
 
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`,
