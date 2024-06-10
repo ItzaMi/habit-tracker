@@ -251,8 +251,9 @@ const manageSubscriptionStatusChange = async (
     .eq('stripe_customer_id', customerId)
     .single();
 
-  if (noCustomerError)
+  if (noCustomerError) {
     throw new Error(`Customer lookup failed: ${noCustomerError.message}`);
+  }
 
   const { id: uuid } = customerData!;
 
