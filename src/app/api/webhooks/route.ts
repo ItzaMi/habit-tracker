@@ -32,6 +32,7 @@ export async function POST(req: Request) {
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
+          console.log('sub event 1', event);
           const subscription = event.data.object as Stripe.Subscription;
 
           console.log('sub', subscription);
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
           );
           break;
         case 'checkout.session.completed':
+          console.log('sub event 2', event);
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
           if (checkoutSession.mode === 'subscription') {
