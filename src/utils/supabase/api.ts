@@ -238,18 +238,19 @@ const checkIfUserIsCustomer = async (uuid: string) => {
     return null;
   }
 };
+
 const manageSubscriptionStatusChange = async (
   subscriptionId: string,
   customerId: string,
   createAction = false,
 ) => {
-  const supabase = createSupabaseClient(
+  const supabaseAdmin = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   );
 
   // Get customer's UUID from mapping table.
-  const { data: customerData, error: noCustomerError } = await supabase
+  const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from('customers')
     .select('id')
     .eq('stripe_customer_id', customerId)
@@ -261,30 +262,19 @@ const manageSubscriptionStatusChange = async (
 
   const { id: uuid } = customerData!;
 
-  console.log('customer data', uuid);
-
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method'],
   });
-
-  console.log('subscription data', subscription);
-
-  if (!subscription) {
-    throw new Error('Subscription not found.');
-  }
-
+  // Upsert the latest status of the subscription object.
   const subscriptionData = {
     subscription_id: subscription.id,
     user_id: uuid,
     status: subscription.status,
   };
 
-  const { error: upsertError } = await supabase
+  const { error: upsertError } = await supabaseAdmin
     .from('subscriptions')
-    .upsert([subscriptionData], {
-      onConflict: 'user_id',
-      ignoreDuplicates: false,
-    });
+    .upsert([subscriptionData]);
 
   if (upsertError) {
     throw new Error(
@@ -295,8 +285,6 @@ const manageSubscriptionStatusChange = async (
   console.log(
     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`,
   );
-
-  return subscriptionData;
 };
 
 export {
