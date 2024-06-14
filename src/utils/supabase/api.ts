@@ -143,7 +143,7 @@ const createOrRetrieveCustomer = async ({
     .from('customers')
     .select('*')
     .eq('id', uuid)
-    .maybeSingle();
+    .single();
 
   if (queryError) {
     throw new Error(`Supabase customer lookup failed: ${queryError.message}`);
@@ -161,9 +161,12 @@ const createOrRetrieveCustomer = async ({
   } else {
     // If Stripe ID is missing from Supabase, try to retrieve Stripe customer ID by email
     const stripeCustomers = await stripe.customers.list({ email: email });
+    console.log('stripeCustomers', stripeCustomers);
     stripeCustomerId =
       stripeCustomers.data.length > 0 ? stripeCustomers.data[0].id : undefined;
   }
+
+  console.log('stripeCustomerId 2222', stripeCustomerId);
 
   // If still no stripeCustomerId, create a new customer in Stripe
   const stripeIdToInsert = stripeCustomerId
