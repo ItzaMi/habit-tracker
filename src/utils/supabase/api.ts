@@ -306,7 +306,8 @@ const manageSubscriptionStatusChange = async (
 
   const { error: upsertError } = await supabaseAdmin
     .from('subscriptions')
-    .upsert([subscriptionData]);
+    .update({ status: subscription.status })
+    .eq('user_id', uuid);
 
   if (upsertError) {
     throw new Error(
