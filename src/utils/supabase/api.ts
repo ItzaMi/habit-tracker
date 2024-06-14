@@ -216,6 +216,21 @@ const createOrRetrieveCustomer = async ({
   }
 };
 
+const getUsers = async () => {
+  const supabase = createClient();
+  const { data: usersData, error: queryError } = await supabase
+    .from('customers')
+    .select('*');
+
+  if (queryError) {
+    throw new Error(`Users lookup failed: ${queryError.message}`);
+  }
+
+  console.log('usersData', usersData);
+
+  return usersData;
+};
+
 const checkIfUserIsCustomer = async (uuid: string) => {
   const supabase = createClient();
   const { data: customerData, error: queryError } = await supabase
@@ -308,4 +323,5 @@ export {
   createOrRetrieveCustomer,
   checkIfUserIsCustomer,
   manageSubscriptionStatusChange,
+  getUsers,
 };

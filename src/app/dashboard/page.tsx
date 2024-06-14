@@ -9,6 +9,7 @@ import {
   getHabits,
   handleHabitOccurenceCheck,
   handleHabitDelete,
+  getUsers,
 } from '@/utils/supabase/api';
 import { createClient } from '@/utils/supabase/server';
 
@@ -24,6 +25,8 @@ const Dashboard = async () => {
   if (!user) {
     redirect('/error');
   }
+
+  console.log('users', getUsers());
 
   const habitsData = await getHabits(user);
 
