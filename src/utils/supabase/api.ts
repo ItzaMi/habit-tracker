@@ -249,18 +249,24 @@ const manageSubscriptionStatusChange = async (
     process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   );
 
+  console.log('ssss', customerId);
+
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from('customers')
-    .select('id')
-    .eq('stripe_customer_id', customerId)
-    .single();
+    .select('*')
+    .eq('stripe_customer_id', customerId);
+
+  console.log('customerData', customerData);
+
+  // THIS FAILED HERE BUT WHY?
+  // Error: Customer lookup failed: JSON object requested, multiple (or no) rows returned
 
   if (noCustomerError) {
     throw new Error(`Customer lookup failed: ${noCustomerError.message}`);
   }
 
-  const { id: uuid } = customerData!;
+  const { id: uuid } = customerData[0]!;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method'],
