@@ -43,6 +43,7 @@ const checkoutWithStripe = async () => {
   let session;
   try {
     session = await stripe.checkout.sessions.create({
+      customer,
       ui_mode: 'embedded',
       line_items: [
         {
