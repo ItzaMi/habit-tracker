@@ -205,6 +205,8 @@ const createOrRetrieveCustomer = async ({
       uuid,
       stripeIdToInsert,
     );
+
+    console.log('upsertedStripeCustomer', upsertedStripeCustomer);
     if (!upsertedStripeCustomer)
       throw new Error('Supabase customer record creation failed.');
 
