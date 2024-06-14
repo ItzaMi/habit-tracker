@@ -294,12 +294,15 @@ const manageSubscriptionStatusChange = async (
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method'],
   });
+  console.log('subscription 123', subscription);
   // Upsert the latest status of the subscription object.
   const subscriptionData = {
     subscription_id: subscription.id,
     user_id: uuid,
     status: subscription.status,
   };
+
+  console.log('subscriptionData', subscriptionData);
 
   const { error: upsertError } = await supabaseAdmin
     .from('subscriptions')
