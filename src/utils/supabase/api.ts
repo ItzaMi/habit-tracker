@@ -165,6 +165,8 @@ const createOrRetrieveCustomer = async ({
     const stripeCustomers = await stripe.customers.list({ email: email });
     stripeCustomerId =
       stripeCustomers.data.length > 0 ? stripeCustomers.data[0].id : undefined;
+
+    console.log('stripeCustomers', stripeCustomers);
   }
 
   console.log('stripeCustomerId', stripeCustomerId);
