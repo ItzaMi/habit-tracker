@@ -272,18 +272,11 @@ const manageSubscriptionStatusChange = async (
     process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   );
 
-  console.log('ssss', customerId);
-
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
     .from('customers')
     .select('*')
     .eq('stripe_customer_id', customerId);
-
-  console.log('customerData', customerData);
-
-  // THIS FAILED HERE BUT WHY?
-  // Error: Customer lookup failed: JSON object requested, multiple (or no) rows returned
 
   if (noCustomerError) {
     throw new Error(`Customer lookup failed: ${noCustomerError.message}`);
@@ -294,7 +287,7 @@ const manageSubscriptionStatusChange = async (
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ['default_payment_method'],
   });
-  console.log('subscription 123', subscription);
+
   // Upsert the latest status of the subscription object.
   const subscriptionData = {
     subscription_id: subscription.id,
@@ -302,21 +295,42 @@ const manageSubscriptionStatusChange = async (
     status: subscription.status,
   };
 
-  console.log('subscriptionData', subscriptionData);
+  // check if user exists in subscriptions table
+  const { data: existingSubscriptionData, error: queryError } =
+    await supabaseAdmin
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', uuid)
+      .maybeSingle();
 
-  const { error: upsertError } = await supabaseAdmin
-    .from('subscriptions')
-    .upsert([subscriptionData]);
+  // if user exists, update subscription status
+  if (existingSubscriptionData) {
+    const { error: updateError } = await supabaseAdmin
+      .from('subscriptions')
+      .update({ status: subscription.status })
+      .eq('user_id', uuid);
 
-  if (upsertError) {
-    throw new Error(
-      `Subscription insert/update failed: ${upsertError.message}`,
+    if (updateError) {
+      throw new Error(`Subscription update failed: ${updateError.message}`);
+    }
+
+    console.log(`Updated subscription [${subscription.id}] for user [${uuid}]`);
+    return;
+  } else {
+    // if user does not exist, insert subscription
+    const { error: insertError } = await supabaseAdmin
+      .from('subscriptions')
+      .insert([subscriptionData]);
+
+    if (insertError) {
+      throw new Error(`Subscription insert failed: ${insertError.message}`);
+    }
+
+    console.log(
+      `Inserted subscription [${subscription.id}] for user [${uuid}]`,
     );
+    return;
   }
-
-  console.log(
-    `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`,
-  );
 };
 
 export {
