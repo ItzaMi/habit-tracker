@@ -13,6 +13,15 @@ export const metadata: Metadata = {
   title: 'ItzaHabit | Create habits that run on autopilot',
   description:
     'The goal is to help you create routines that run on autopilot, no effort required. Once your habits are part of who you are, say goodbye to the tracker. Ready to make lasting changes?',
+  openGraph: {
+    images: [
+      {
+        url: 'https://itzahabit.itzami.com/opengraph-image.png',
+        width: 1440,
+        height: 756,
+      },
+    ],
+  },
 };
 
 const RootLayout = async ({
