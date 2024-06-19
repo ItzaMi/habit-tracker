@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+// eslint-disable-next-line import/order
 import { Inter } from 'next/font/google';
 
 import './globals.css';
+import Script from 'next/script';
+
 import Footer from '@/components/common/footer';
 import Navbar from '@/components/common/navbar';
 import { cn } from '@/lib/utils';
@@ -37,6 +40,10 @@ const RootLayout = async ({
 
   return (
     <html lang="en">
+      <Script
+        src="https://cloud.umami.is/script.js"
+        data-website-id="90cc1651-5338-4a4b-9fe3-148beeb060e7"
+      />
       <body className={cn('px-4', inter.className)}>
         <Navbar user={user} />
         {children}
